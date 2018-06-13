@@ -23,9 +23,10 @@ public class StackController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
-		resetStack();
 		colorProvider = new TileColorProvider();
 		gameState = GameObject.FindGameObjectWithTag("GameState").GetComponent<GameState>();
+
+		resetStack();
 	}
 
 	// Update is called once per frame

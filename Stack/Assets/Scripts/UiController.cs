@@ -30,6 +30,7 @@ public class UiController : MonoBehaviour {
 				startPromptText.enabled = true;
 				checkForInput();
 				break;
+			case GameState.State.GAME_STARTING:
 			case GameState.State.GAME_RUNNING:
 				scoreText.enabled = true;
 				gameOverText.enabled = false;
@@ -46,7 +47,7 @@ public class UiController : MonoBehaviour {
 
 	private void checkForInput() {
 		if (Input.GetButtonDown("PlaceTile")) {
-			gameState.setGameState(GameState.State.GAME_RUNNING);
+			gameState.setGameState(GameState.State.GAME_STARTING);
 		}
 	}
 }
