@@ -15,35 +15,35 @@ public class StackController : MonoBehaviour {
     private Vector3 movementDirection;
     private TileColorProvider colorProvider;
 
+	private GameState gameState;
+
 	// Use this for initialization
 	void Start () {
-        currentTile = null;
-        stackSize = 0;
-
-        colorProvider = new TileColorProvider();
-
-        previousTile = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
-        previousTile.transform.SetParent(transform);
-        previousTile.transform.localPosition = Vector3.zero;
-        previousTile.transform.localScale = new Vector3(baseTileSize, tileHeight, baseTileSize);
-        previousTile.GetComponent<MeshRenderer>().material.color = colorProvider.getCurrentColor();
+		resetStack();
+		colorProvider = new TileColorProvider();
+		gameState = GameObject.FindGameObjectWithTag("GameState").GetComponent<GameState>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if(currentTile == null)
-        {
-            movementDirection = getMovementDirection();
-            currentTile = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
-            currentTile.SetParent(transform);
-            currentTile.localPosition = movementDirection * movementBounds + new Vector3(previousTile.localPosition.x, tileHeight * (stackSize + 1), previousTile.localPosition.z);
-            currentTile.localScale = previousTile.transform.localScale;
-            currentTile.GetComponent<MeshRenderer>().material.color = colorProvider.getNextColor();
-        } else
-        {
-            moveCurrentTile();
-            handleInput();
-        }
+		GameState.State state = gameState.getGameState();
+		if (state == GameState.State.GAME_RUNNING) {
+			if (currentTile == null) {
+				movementDirection = getMovementDirection();
+				currentTile = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+				currentTile.SetParent(transform);
+				currentTile.localPosition = movementDirection * movementBounds + new Vector3(previousTile.localPosition.x, tileHeight * (stackSize + 1), previousTile.localPosition.z);
+				currentTile.localScale = previousTile.transform.localScale;
+				currentTile.GetComponent<MeshRenderer>().material.color = colorProvider.getNextColor();
+			} else {
+				moveCurrentTile();
+				handleInput();
+			}
+		} else if(state == GameState.State.GAME_STARTING) {
+			resetStack();
+			gameState.resetScore();
+			gameState.setGameState(GameState.State.GAME_RUNNING);
+		}
 	}
 
     private Vector3 getMovementDirection()
@@ -98,6 +98,7 @@ public class StackController : MonoBehaviour {
             previousTile = currentTile;
             currentTile = null;
             stackSize++;
+			gameState.incrementScore();
         }
     }
 
@@ -112,4 +113,15 @@ public class StackController : MonoBehaviour {
     {
         currentTile.Translate(movementDirection * movementSpeed * -1.0f * Time.deltaTime);
     }
+
+	private void resetStack() {
+		currentTile = null;
+		stackSize = 0;
+
+		previousTile = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+		previousTile.transform.SetParent(transform);
+		previousTile.transform.localPosition = Vector3.zero;
+		previousTile.transform.localScale = new Vector3(baseTileSize, tileHeight, baseTileSize);
+		previousTile.GetComponent<MeshRenderer>().material.color = colorProvider.getCurrentColor();
+	}
 }
