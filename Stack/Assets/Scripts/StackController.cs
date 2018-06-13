@@ -93,7 +93,7 @@ public class StackController : MonoBehaviour {
 			currentTile.localScale = new Vector3(intersection.width, tileHeight, intersection.height);
 			currentTile.localPosition = new Vector3(intersection.x + intersection.width / 2, currentTile.localPosition.y, intersection.y + intersection.height / 2);
 
-			Camera.main.transform.Translate(Vector3.up * tileHeight);
+			Camera.main.transform.Translate(Vector3.up * tileHeight, Space.World);
 
 			previousTile = currentTile;
 			currentTile = null;
