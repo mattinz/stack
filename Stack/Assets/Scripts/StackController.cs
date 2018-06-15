@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider))]
 public class StackController : MonoBehaviour {
 
 	[SerializeField]
@@ -18,13 +19,14 @@ public class StackController : MonoBehaviour {
 	private int stackSize;
 	private Vector3 movementDirection;
 	private TileColorProvider colorProvider;
-
 	private GameState gameState;
+	private BoxCollider outOfBoundsCollider;
 
 	// Use this for initialization
 	void Start() {
 		colorProvider = new TileColorProvider();
 		gameState = GameObject.FindGameObjectWithTag("GameState").GetComponent<GameState>();
+		outOfBoundsCollider = GetComponent<BoxCollider>();
 
 		resetStack();
 	}
@@ -34,15 +36,21 @@ public class StackController : MonoBehaviour {
 		GameState.State state = gameState.getGameState();
 		if (state == GameState.State.GAME_RUNNING) {
 			if (currentTile == null) {
+				float stackHeight = getStackHeight();
 				movementDirection = getMovementDirection();
 				currentTile = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
 				currentTile.SetParent(transform);
-				currentTile.localPosition = movementDirection * movementBounds + new Vector3(previousTile.localPosition.x, tileHeight * (stackSize + 1), previousTile.localPosition.z);
+				currentTile.localPosition = movementDirection * movementBounds + new Vector3(previousTile.localPosition.x, stackHeight, previousTile.localPosition.z);
 				currentTile.localScale = previousTile.transform.localScale;
 				currentTile.GetComponent<MeshRenderer>().material.color = colorProvider.getNextColor();
+
+				Rigidbody rigidBody = currentTile.gameObject.AddComponent<Rigidbody>();
+				rigidBody.isKinematic = true;
+
+				outOfBoundsCollider.center = movementDirection * -1 * movementBounds + new Vector3(0, stackHeight, 0);
 			} else {
-				moveCurrentTile();
 				handleInput();
+				moveCurrentTile();
 			}
 		} else if (state == GameState.State.GAME_STARTING) {
 			resetStack();
@@ -51,24 +59,35 @@ public class StackController : MonoBehaviour {
 		}
 	}
 
+	private void OnTriggerEnter(Collider other) {
+		Debug.Log("Collision");
+		if (other.transform == currentTile) {
+			gameState.setGameState(GameState.State.GAME_OVER);
+		}
+	}
+
 	private Vector3 getMovementDirection() {
 		Vector3 movementDirection = new Vector3();
-		switch (stackSize % 2) {
+		switch (stackSize % 4) {
 			case 0:
 				movementDirection.x = -1;
 				break;
 			case 1:
+				movementDirection.z = -1;
+				break;
+			case 2:
+				movementDirection.x = 1;
+				break;
+			case 3:
 				movementDirection.z = 1;
 				break;
-				/*case 2:
-                movementDirection.x = 1;
-                break;
-            case 3:
-                movementDirection.z = 1;
-                break;*/
 		}
 
 		return movementDirection;
+	}
+
+	public float getStackHeight() {
+		return tileHeight * (stackSize + 1);
 	}
 
 	public Rect getTileIntersection() {
@@ -109,10 +128,16 @@ public class StackController : MonoBehaviour {
 	}
 
 	private void moveCurrentTile() {
-		currentTile.Translate(movementDirection * movementSpeed * -1.0f * Time.deltaTime);
+		if (currentTile != null) {
+			currentTile.Translate(movementDirection * movementSpeed * -1.0f * Time.deltaTime);
+		}
 	}
 
 	private void resetStack() {
+		foreach (Transform child in transform) {
+			Destroy(child.gameObject);
+		}
+
 		currentTile = null;
 		stackSize = 0;
 
