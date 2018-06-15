@@ -54,7 +54,7 @@ public class StackController : MonoBehaviour {
 			}
 		} else if (state == GameState.State.GAME_STARTING) {
 			resetStack();
-			gameState.resetScore();
+			gameState.reset();
 			gameState.setGameState(GameState.State.GAME_RUNNING);
 		}
 	}
@@ -111,8 +111,6 @@ public class StackController : MonoBehaviour {
 		area.width = Mathf.Max(0.0f, x1 - x2);
 		area.height = Mathf.Max(0.0f, y1 - y2);
 
-
-
 		return area;
 	}
 
@@ -125,7 +123,7 @@ public class StackController : MonoBehaviour {
 			float zSize;
 			float x;
 			float z;
-			if(intersection.height == currentTileBounds.height) {
+			if (intersection.height == currentTileBounds.height) {
 				xSize = currentTileBounds.width - intersection.width;
 				zSize = intersection.height;
 
@@ -139,7 +137,7 @@ public class StackController : MonoBehaviour {
 				z = currentTileBounds.y == intersection.y ? intersection.y + intersection.height : currentTileBounds.y;
 			}
 
-			if(xSize > 0.001f && zSize > 0.001f) {
+			if (xSize > 0.001f && zSize > 0.001f) {
 				GameObject remainder = GameObject.CreatePrimitive(PrimitiveType.Cube);
 				remainder.transform.SetParent(transform);
 				remainder.transform.localScale = new Vector3(xSize, tileHeight, zSize);
@@ -153,12 +151,11 @@ public class StackController : MonoBehaviour {
 			currentTile.localPosition = new Vector3(intersection.x + intersection.width / 2, currentTile.localPosition.y, intersection.y + intersection.height / 2);
 			Destroy(currentTile.GetComponent<Rigidbody>());
 
-			Camera.main.transform.Translate(Vector3.up * tileHeight, Space.World);
-
 			previousTile = currentTile;
 			currentTile = null;
 			stackSize++;
 			gameState.incrementScore();
+			gameState.setStackHeight(getStackHeight());
 		}
 	}
 

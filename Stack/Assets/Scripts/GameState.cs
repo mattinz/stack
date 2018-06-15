@@ -13,10 +13,11 @@ public class GameState : MonoBehaviour {
 
 	private State currentState;
 	private int score;
+	private float stackHeight;
 
 	private void Awake() {
 		currentState = State.GAME_NOT_STARTED;
-		score = 0;
+		reset();
 	}
 
 	public State getGameState() {
@@ -27,15 +28,24 @@ public class GameState : MonoBehaviour {
 		return score;
 	}
 
+	public float getStackHeight() {
+		return stackHeight;
+	}
+
 	public void incrementScore() {
 		score++;
 	}
 
-	public void resetScore() {
+	public void reset() {
 		score = 0;
+		stackHeight = 0;
 	}
 
 	public void setGameState(State state) {
 		currentState = state;
+	}
+
+	public void setStackHeight(float height) {
+		stackHeight = height;
 	}
 }
