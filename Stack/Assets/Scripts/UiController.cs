@@ -46,7 +46,7 @@ public class UiController : MonoBehaviour {
 	}
 
 	private void checkForInput() {
-		if (Input.GetButtonDown("PlaceTile")) {
+		if (gameState.isInputDown()) {
 			gameState.setGameState(GameState.State.GAME_STARTING);
 		}
 	}

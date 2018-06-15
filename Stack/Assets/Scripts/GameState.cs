@@ -32,6 +32,10 @@ public class GameState : MonoBehaviour {
 		return stackHeight;
 	}
 
+	public bool isInputDown() {
+		return Input.GetButtonDown("PlaceTile") || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+	}
+
 	public void incrementScore() {
 		score++;
 	}

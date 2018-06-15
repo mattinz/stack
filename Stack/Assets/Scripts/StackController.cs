@@ -13,6 +13,8 @@ public class StackController : MonoBehaviour {
 	private float movementBounds = 3.0f;
 	[SerializeField]
 	private float movementSpeed = 1.0f;
+	[SerializeField]
+	private Material baseMaterial;
 
 	private Transform currentTile;
 	private Transform previousTile;
@@ -42,6 +44,8 @@ public class StackController : MonoBehaviour {
 				currentTile.SetParent(transform);
 				currentTile.localPosition = movementDirection * movementBounds + new Vector3(previousTile.localPosition.x, stackHeight, previousTile.localPosition.z);
 				currentTile.localScale = previousTile.transform.localScale;
+
+				currentTile.GetComponent<MeshRenderer>().material = baseMaterial;
 				currentTile.GetComponent<MeshRenderer>().material.color = colorProvider.getNextColor();
 
 				Rigidbody rigidBody = currentTile.gameObject.AddComponent<Rigidbody>();
@@ -60,7 +64,6 @@ public class StackController : MonoBehaviour {
 	}
 
 	private void OnTriggerEnter(Collider other) {
-		Debug.Log("Collision");
 		if (other.transform == currentTile) {
 			gameState.setGameState(GameState.State.GAME_OVER);
 		}
@@ -115,7 +118,7 @@ public class StackController : MonoBehaviour {
 	}
 
 	private void handleInput() {
-		if (Input.GetButtonDown("PlaceTile") && isCurrentTileOverStack()) {
+		if (gameState.isInputDown() && isCurrentTileOverStack()) {
 			Rect intersection = getTileIntersection();
 			Rect currentTileBounds = getBoundingRectangle(currentTile);
 
@@ -142,9 +145,9 @@ public class StackController : MonoBehaviour {
 				remainder.transform.SetParent(transform);
 				remainder.transform.localScale = new Vector3(xSize, tileHeight, zSize);
 				remainder.transform.position = new Vector3(x + xSize / 2, currentTile.position.y, z + zSize / 2);
+				remainder.GetComponent<MeshRenderer>().material = baseMaterial;
 				remainder.GetComponent<MeshRenderer>().material.color = colorProvider.getCurrentColor();
-
-				Rigidbody remainderRigidBody = remainder.AddComponent<Rigidbody>();
+				remainder.AddComponent<Rigidbody>();
 			}
 
 			currentTile.localScale = new Vector3(intersection.width, tileHeight, intersection.height);
@@ -183,6 +186,7 @@ public class StackController : MonoBehaviour {
 		previousTile.transform.SetParent(transform);
 		previousTile.transform.localPosition = Vector3.zero;
 		previousTile.transform.localScale = new Vector3(baseTileSize, tileHeight, baseTileSize);
+		previousTile.GetComponent<MeshRenderer>().material = baseMaterial;
 		previousTile.GetComponent<MeshRenderer>().material.color = colorProvider.getCurrentColor();
 	}
 }
