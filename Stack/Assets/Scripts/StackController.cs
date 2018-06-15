@@ -66,6 +66,13 @@ public class StackController : MonoBehaviour {
 		}
 	}
 
+	private Rect getBoundingRectangle(Transform tileTransform) {
+		return new Rect(tileTransform.localPosition.x - tileTransform.localScale.x / 2,
+			tileTransform.localPosition.z - tileTransform.localScale.z / 2,
+			tileTransform.localScale.x,
+			tileTransform.localScale.z);
+	}
+
 	private Vector3 getMovementDirection() {
 		Vector3 movementDirection = new Vector3();
 		switch (stackSize % 4) {
@@ -91,8 +98,8 @@ public class StackController : MonoBehaviour {
 	}
 
 	public Rect getTileIntersection() {
-		Rect r1 = new Rect(currentTile.localPosition.x - currentTile.localScale.x / 2, currentTile.localPosition.z - currentTile.localScale.z / 2, currentTile.localScale.x, currentTile.localScale.z);
-		Rect r2 = new Rect(previousTile.localPosition.x - previousTile.localScale.x / 2, previousTile.localPosition.z - previousTile.localScale.z / 2, previousTile.localScale.x, previousTile.localScale.z);
+		Rect r1 = getBoundingRectangle(currentTile);
+		Rect r2 = getBoundingRectangle(previousTile);
 
 		Rect area = new Rect();
 		float x1 = Mathf.Min(r1.xMax, r2.xMax);
@@ -103,14 +110,48 @@ public class StackController : MonoBehaviour {
 		area.y = Mathf.Min(y1, y2);
 		area.width = Mathf.Max(0.0f, x1 - x2);
 		area.height = Mathf.Max(0.0f, y1 - y2);
+
+
+
 		return area;
 	}
 
 	private void handleInput() {
 		if (Input.GetButtonDown("PlaceTile") && isCurrentTileOverStack()) {
 			Rect intersection = getTileIntersection();
+			Rect currentTileBounds = getBoundingRectangle(currentTile);
+
+			float xSize;
+			float zSize;
+			float x;
+			float z;
+			if(intersection.height == currentTileBounds.height) {
+				xSize = currentTileBounds.width - intersection.width;
+				zSize = intersection.height;
+
+				x = currentTileBounds.x == intersection.x ? intersection.x + intersection.width : currentTileBounds.x;
+				z = intersection.y;
+			} else {
+				zSize = currentTileBounds.height - intersection.height;
+				xSize = intersection.width;
+
+				x = intersection.x;
+				z = currentTileBounds.y == intersection.y ? intersection.y + intersection.height : currentTileBounds.y;
+			}
+
+			if(xSize > 0.001f && zSize > 0.001f) {
+				GameObject remainder = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				remainder.transform.SetParent(transform);
+				remainder.transform.localScale = new Vector3(xSize, tileHeight, zSize);
+				remainder.transform.position = new Vector3(x + xSize / 2, currentTile.position.y, z + zSize / 2);
+				remainder.GetComponent<MeshRenderer>().material.color = colorProvider.getCurrentColor();
+
+				Rigidbody remainderRigidBody = remainder.AddComponent<Rigidbody>();
+			}
+
 			currentTile.localScale = new Vector3(intersection.width, tileHeight, intersection.height);
 			currentTile.localPosition = new Vector3(intersection.x + intersection.width / 2, currentTile.localPosition.y, intersection.y + intersection.height / 2);
+			Destroy(currentTile.GetComponent<Rigidbody>());
 
 			Camera.main.transform.Translate(Vector3.up * tileHeight, Space.World);
 
@@ -122,8 +163,8 @@ public class StackController : MonoBehaviour {
 	}
 
 	private bool isCurrentTileOverStack() {
-		Rect currentTileBounds = new Rect(currentTile.localPosition.x - currentTile.localScale.x / 2, currentTile.localPosition.z - currentTile.localScale.z / 2, currentTile.localScale.x, currentTile.localScale.z);
-		Rect previousTileBounds = new Rect(previousTile.localPosition.x - previousTile.localScale.x/2, previousTile.localPosition.z - previousTile.localScale.z / 2, previousTile.localScale.x, previousTile.localScale.z);
+		Rect currentTileBounds = getBoundingRectangle(currentTile);
+		Rect previousTileBounds = getBoundingRectangle(previousTile);
 		return currentTileBounds.Overlaps(previousTileBounds);
 	}
 
