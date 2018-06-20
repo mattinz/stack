@@ -26,8 +26,8 @@ public class StackController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
-		colorProvider = new TileColorProvider();
 		gameState = GameObject.FindGameObjectWithTag("GameState").GetComponent<GameState>();
+		colorProvider = gameState.getTileColorProvider();
 		outOfBoundsCollider = GetComponent<BoxCollider>();
 
 		resetStack();

@@ -15,9 +15,13 @@ public class GameState : MonoBehaviour {
 	private int score;
 	private float stackHeight;
 
+	private TileColorProvider colorProvider;
+
 	private void Awake() {
 		currentState = State.GAME_NOT_STARTED;
 		reset();
+
+		colorProvider = new TileColorProvider();
 	}
 
 	public State getGameState() {
@@ -30,6 +34,10 @@ public class GameState : MonoBehaviour {
 
 	public float getStackHeight() {
 		return stackHeight;
+	}
+
+	public TileColorProvider getTileColorProvider() {
+		return colorProvider;
 	}
 
 	public bool isInputDown() {

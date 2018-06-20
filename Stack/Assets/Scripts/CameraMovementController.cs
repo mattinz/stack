@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
+public class CameraMovementController : MonoBehaviour {
 
 	private GameState gameState;
 	private Vector3 startingPosition;
