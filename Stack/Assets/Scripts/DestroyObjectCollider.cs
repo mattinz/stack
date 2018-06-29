@@ -3,7 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DestroyObjectCollider : MonoBehaviour {
+	private ObjectPool objectPool;
+
+	private void Start() {
+		objectPool = GameObject.FindGameObjectWithTag("ObjectPool").GetComponent<ObjectPool>();
+	}
+
 	private void OnTriggerEnter(Collider other) {
-		Destroy(other.gameObject);
+		objectPool.returnObjectToPool(other.gameObject);
 	}
 }
