@@ -6,7 +6,8 @@ public class GameState : MonoBehaviour {
 
 	public enum State {
 		GAME_NOT_STARTED,
-		GAME_STARTING,
+		GAME_STARTING_PHASE_ONE,
+		GAME_STARTING_PHASE_TWO,
 		GAME_RUNNING,
 		GAME_OVER
 	}

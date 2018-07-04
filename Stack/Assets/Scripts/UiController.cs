@@ -30,7 +30,7 @@ public class UiController : MonoBehaviour {
 				startPromptText.enabled = true;
 				checkForInput();
 				break;
-			case GameState.State.GAME_STARTING:
+			case GameState.State.GAME_STARTING_PHASE_ONE:
 			case GameState.State.GAME_RUNNING:
 				scoreText.enabled = true;
 				gameOverText.enabled = false;
@@ -47,7 +47,7 @@ public class UiController : MonoBehaviour {
 
 	private void checkForInput() {
 		if (gameState.isInputDown()) {
-			gameState.setGameState(GameState.State.GAME_STARTING);
+			gameState.setGameState(GameState.State.GAME_STARTING_PHASE_ONE);
 		}
 	}
 }

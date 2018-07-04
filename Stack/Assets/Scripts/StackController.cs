@@ -54,10 +54,10 @@ public class StackController : MonoBehaviour {
 				handleInput();
 				moveCurrentTile();
 			}
-		} else if (state == GameState.State.GAME_STARTING) {
+		} else if (state == GameState.State.GAME_STARTING_PHASE_ONE) {
 			resetStack();
 			gameState.reset();
-			gameState.setGameState(GameState.State.GAME_RUNNING);
+			gameState.setGameState(GameState.State.GAME_STARTING_PHASE_TWO);
 		}
 	}
 
