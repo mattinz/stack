@@ -125,8 +125,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: edc1c8bc8bf1b7c42add46052eb7a42f, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
+  m_Volume: 0.75
+  m_Pitch: 0.4
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -220,3 +220,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 717c3c774e14c324ca1681a42b110ef7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxVolumeCollisionVelocityThreshold: 4
