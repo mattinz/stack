@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class TileCollisionSound : MonoBehaviour {
 
+	[SerializeField] float minPitch = 0.3f;
+	[SerializeField] float maxPitch = 0.35f;
 	[SerializeField] private float maxVolumeCollisionVelocityThreshold = 4.0f;
 	[SerializeField] private float minTimeBetweenCollisions = 0.1f;
 
@@ -36,8 +38,9 @@ public class TileCollisionSound : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter(Collision collision) {
-		if(!rigidBody.isKinematic && canPlaySound) {
+		if(!rigidBody.isKinematic && !rigidBody.IsSleeping() && canPlaySound) {
 			audioSource.volume = startingVolume * Mathf.Clamp01(collision.relativeVelocity.magnitude / maxVolumeCollisionVelocityThreshold);
+			audioSource.pitch = Random.Range(minPitch, maxPitch);
 			audioSource.Play();
 			elapsedTime = 0.0f;
 			canPlaySound = false;
