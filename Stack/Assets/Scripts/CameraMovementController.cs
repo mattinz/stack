@@ -6,11 +6,13 @@ using UnityEngine;
 public class CameraMovementController : MonoBehaviour {
 
 	[SerializeField] private float cameraBaseSpeed = 1.0f;
+	[SerializeField] private float cameraSizeChangeRate = 1.0f;
 
 	private GameState gameState;
 	private Camera camera;
 	private Vector3 startingPosition;
 	private Vector3 targetCameraPosition;
+	private float targetCameraSize;
 	private float startingCameraSize;
 	private float distanceFromStack;
 	private float actualSpeed;
@@ -24,6 +26,7 @@ public class CameraMovementController : MonoBehaviour {
 		alignCameraToStackHeight();
 
 		startingCameraSize = camera.orthographicSize;
+		targetCameraSize = startingCameraSize;
 		distanceFromStack = Vector3.Distance(Vector3.zero, new Vector3(startingPosition.x, 0.0f, startingPosition.z));
 		actualSpeed = cameraBaseSpeed;
 	}
@@ -36,12 +39,12 @@ public class CameraMovementController : MonoBehaviour {
 				float cameraHeightOffset = distanceFromStack / Mathf.Tan((90 - transform.eulerAngles.x) * 0.0174533f); // The magic number here converts degrees to radians.
 				targetCameraPosition.y = gameState.getStackHeight() / 2.0f + cameraHeightOffset;
 				actualSpeed = cameraBaseSpeed * 2.0f;
-				camera.orthographicSize = startingCameraSize * 1.5f;
+				targetCameraSize = startingCameraSize * 1.5f;
 				break;
 			case GameState.State.GAME_STARTING_PHASE_TWO:
 				alignCameraToStackHeight();
-				transform.position = targetCameraPosition;
-				camera.orthographicSize = startingCameraSize;
+				//transform.position = targetCameraPosition;
+				targetCameraSize = startingCameraSize;
 				gameState.setGameState(GameState.State.GAME_RUNNING);
 				break;
 			default:
@@ -51,6 +54,9 @@ public class CameraMovementController : MonoBehaviour {
 		}
 
 		transform.position = Vector3.MoveTowards(transform.position, targetCameraPosition, actualSpeed * Time.deltaTime);
+		if(camera.orthographicSize != targetCameraSize) {
+			camera.orthographicSize = Mathf.Lerp(camera.orthographicSize, targetCameraSize, cameraSizeChangeRate * Time.deltaTime);
+		}
 	}
 
 	private void alignCameraToStackHeight() {
