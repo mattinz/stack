@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UiController : MonoBehaviour {
-
+	[SerializeField]
+	private string highScoreListTitle;
 	[SerializeField]
 	private Text scoreText;
 	[SerializeField]
-	private Text gameOverText;
+	private Text highScoreListText;
 	[SerializeField]
 	private Text startPromptText;
 
@@ -26,19 +27,21 @@ public class UiController : MonoBehaviour {
 		switch (state) {
 			case GameState.State.GAME_NOT_STARTED:
 				scoreText.enabled = false;
-				gameOverText.enabled = false;
+				highScoreListText.enabled = false;
 				startPromptText.enabled = true;
 				checkForInput();
 				break;
 			case GameState.State.GAME_STARTING_PHASE_ONE:
+			case GameState.State.GAME_STARTING_PHASE_TWO:
 			case GameState.State.GAME_RUNNING:
 				scoreText.enabled = true;
-				gameOverText.enabled = false;
+				highScoreListText.enabled = false;
 				startPromptText.enabled = false;
 				break;
 			case GameState.State.GAME_OVER:
 				scoreText.enabled = true;
-				gameOverText.enabled = true;
+				highScoreListText.text = getHighScoreListString(gameState.getHighScores(), highScoreListTitle);
+				highScoreListText.enabled = true;
 				startPromptText.enabled = true;
 				checkForInput();
 				break;
@@ -49,5 +52,15 @@ public class UiController : MonoBehaviour {
 		if (gameState.isInputDown()) {
 			gameState.setGameState(GameState.State.GAME_STARTING_PHASE_ONE);
 		}
+	}
+
+	private string getHighScoreListString(int[] highScores, string title) {
+		string result = title + "\n";
+
+		for(int i = 0; i < highScores.Length; i++) {
+			result += i + 1 + ": " + highScores[i] + "\n";
+		}
+
+		return result;
 	}
 }

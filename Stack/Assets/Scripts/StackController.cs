@@ -56,7 +56,7 @@ public class StackController : MonoBehaviour {
 			}
 		} else if (state == GameState.State.GAME_STARTING_PHASE_ONE) {
 			resetStack();
-			gameState.reset();
+			gameState.resetScore();
 			gameState.setGameState(GameState.State.GAME_STARTING_PHASE_TWO);
 		}
 	}
